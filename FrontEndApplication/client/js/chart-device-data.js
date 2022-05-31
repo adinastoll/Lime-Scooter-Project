@@ -115,10 +115,12 @@ $(document).ready(() => {
     if (device.deviceStatus === false) {
       console.log("Is not available!!")
       rentScooterButton.innerHTML = 'Return Scooter';
+      rentScooterButton.style.color = 'Red';
     }
     else {
       console.log("It IS available--")
       rentScooterButton.innerHTML = 'Rent Scooter';
+      rentScooterButton.style.color = 'Green';
     }
   }
 
