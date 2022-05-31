@@ -15,7 +15,7 @@ $(document).ready(() => {
       this.deviceStatus = 'Unknown';
     }
 
-    addData(time, battery, humidity, status) {
+    addData(time, battery, location, status) {
       this.timeData.push(time);
       this.batteryData.push(battery);
 
@@ -105,7 +105,7 @@ $(document).ready(() => {
     const device = trackedDevices.findDevice(listOfDevices[listOfDevices.selectedIndex].text);
     chartData.labels = device.timeData;
     chartData.datasets[0].data = device.batteryData;
-    chartData.datasets[1].data = device.humidityData;
+    chartData.datasets[1].data = device.locationData;
     myLineChart.update();
   }
   function OnStatusChanged() {
@@ -138,8 +138,8 @@ $(document).ready(() => {
       const messageData = JSON.parse(message.data);
       console.log(messageData);
 
-      // time and either battery or humidity are required
-      if (!messageData.MessageDate || (!messageData.IotData.battery && !messageData.IotData.humidity)) {
+      // time and either battery or location are required
+      if (!messageData.MessageDate || (!messageData.IotData.battery && !messageData.IotData.location)) {
         return;
       }
 
@@ -147,14 +147,14 @@ $(document).ready(() => {
       const existingDeviceData = trackedDevices.findDevice(messageData.DeviceId);
 
       if (existingDeviceData) {
-        existingDeviceData.addData(messageData.MessageDate, messageData.IotData.battery, messageData.IotData.humidity, messageData.IotData.status);
+        existingDeviceData.addData(messageData.MessageDate, messageData.IotData.battery, messageData.IotData.location, messageData.IotData.status);
       } else {
         const newDeviceData = new DeviceData(messageData.DeviceId);
         trackedDevices.devices.push(newDeviceData);
         const numDevices = trackedDevices.getDevicesCount();
         deviceCount.innerText = numDevices === 1 ? `${numDevices} device` : `${numDevices} devices`;
         deviceStatus.innerText = messageData.IotData.status;
-        newDeviceData.addData(messageData.MessageDate, messageData.IotData.battery, messageData.IotData.humidity, messageData.IotData.status);
+        newDeviceData.addData(messageData.MessageDate, messageData.IotData.battery, messageData.IotData.location, messageData.IotData.status);
 
         // add device to the UI list
         const node = document.createElement('option');
