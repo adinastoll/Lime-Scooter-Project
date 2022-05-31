@@ -1,111 +1,65 @@
-﻿using Microsoft.Azure.Devices.Client;
-using System;
-using System.Text;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
+﻿// <copyright file="Program.cs" company="Microsoft">
+// Copyright (c) Microsoft. All rights reserved.
+// </copyright>
 
 namespace SimulatedDeviceScooters
 {
-    class Program
+    using System;
+    using System.Text;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Microsoft.Azure.Devices.Client;
+
+    /// <summary>
+    /// Simulates an IoT device which sends telemetry every second to the IoT Hub.
+    /// </summary>
+    internal class Program
     {
+        private static readonly TransportType TransportType = TransportType.Mqtt;
+        private static readonly TimeSpan TelemetryInterval = TimeSpan.FromSeconds(1);
+
+        private static readonly double DefaultBatteryLevel = 100;
+        private static readonly bool DefaultAvailability = true;
+
+        private static readonly string RentScooterDirectMethod = "RentScooter";
+        private static readonly string RechargeScooterDirectMethod = "RechargeScooter";
+
         private static DeviceClient deviceClient;
-        private static readonly TransportType transportType = TransportType.Mqtt;
 
-        // The device connection string to authenticate the device with your IoT hub.
-        // Using the Azure CLI:
-        // az iot hub device-identity show-connection-string --hub-name {YourIoTHubName} --device-id FirstScooter --output table
-        private static string connectionString = "";
-        private static double defaultBatteryLevel = 100;
-        private static bool defaultAvailability = true;
+        private static double currentBatteryLevel = DefaultBatteryLevel;
+        private static bool scooterIsAvailable = DefaultAvailability;
+        private static bool scooterIsRecharging = false;
 
-        private static double currentBatteryLevel = defaultBatteryLevel;
-        private static bool currentScooterAvailability = defaultAvailability;
-
-        private static string rentScooterDirectMethod = "RentScooter";
-        private static string batteryAlert = "batteryAlert";
-        private static double minimumBatteryLevel = 20;
-        private static TimeSpan telemetryInterval = TimeSpan.FromSeconds(1); // Seconds
-
-        static async Task Main(string[] args)
+        private static async Task Main()
         {
             Console.WriteLine("Simulated device started.");
 
-            ValidateConnectionString(connectionString);
+            string connectionString = await ConnectionStringHandler.GetConnectionStringAsync("FirstScooterConnectionString");
+            ConnectionStringHandler.ValidateConnectionString(connectionString);
 
             // Connect to the IoT Hub using the MQTT protocol
-            deviceClient = DeviceClient.CreateFromConnectionString(connectionString, transportType);
+            deviceClient = DeviceClient.CreateFromConnectionString(connectionString, TransportType);
 
             // Create a handler for the direct method call - To Rent a scooter
-            await deviceClient.SetMethodHandlerAsync(rentScooterDirectMethod, RentScooter, null);
+            await deviceClient.SetMethodHandlerAsync(RentScooterDirectMethod, RentScooter, null);
+
+            // Create a handler for the direct method call - To Rent a scooter
+            await deviceClient.SetMethodHandlerAsync(RechargeScooterDirectMethod, RechargeScooter, null);
 
             // Set up a condition to quit the sample
             Console.WriteLine("Press control-C to exit.");
-            using var cts = new CancellationTokenSource();
-            Console.CancelKeyPress += (sender, eventArgs) =>
+            using (CancellationTokenSource cancellationTokenSource = new())
             {
-                eventArgs.Cancel = true;
-                cts.Cancel();
-                Console.WriteLine("Exiting...");
-            };
-
-            // Sent telemetry to the IoT Hub
-            await SendDeviceToCloudTelemetryAsync(cts.Token);
-        }
-
-        private static async Task SendDeviceToCloudTelemetryAsync(CancellationToken ct)
-        {
-            while (!ct.IsCancellationRequested)
-            {
-                currentBatteryLevel = currentBatteryLevel * 0.9;
-
-                // Create JSON Message
-                string telemetryMessageBody = JsonSerializer.Serialize(
-                    new
-                    {
-                        battery = currentBatteryLevel,
-                        status = currentScooterAvailability
-                    });
-
-                using var telemetryMessage = new Message(Encoding.ASCII.GetBytes(telemetryMessageBody))
+                using CancellationTokenSource cts = cancellationTokenSource;
+                Console.CancelKeyPress += (sender, eventArgs) =>
                 {
-                    ContentType = "application/json",
-                    ContentEncoding = "utf-8"
+                    eventArgs.Cancel = true;
+                    cts.Cancel();
+                    Console.WriteLine("Exiting...");
                 };
 
-                // Add a custom application property to the message.
-                // An IoT hub can filter on these properties without access to the message body.
-                telemetryMessage.Properties.Add(batteryAlert, (currentBatteryLevel < minimumBatteryLevel) ? "true" : "false");
-
-                // Send the telemetry message
-                await deviceClient.SendEventAsync(telemetryMessage);
-                Console.WriteLine($"{ DateTime.Now} > Sending message: {telemetryMessageBody}");
-
-                try
-                {
-                    await Task.Delay(telemetryInterval, ct);
-                }
-                catch (TaskCanceledException)
-                {
-                    // User canceled
-                    return;
-                }
-
-            }
-        }
-
-        private static void ValidateConnectionString(string hubConnectionString)
-        {
-            try
-            {
-                _ = IotHubConnectionStringBuilder.Create(hubConnectionString);
-            }
-            catch (Exception)
-            {
-                Console.WriteLine("An IoT Hub connection string needs to be specified, " +
-                    "please set the environment variable \"IOTHUB_CONNECTION_STRING\" " +
-                    "or pass in \"-s | --HubConnectionString\" through command line.");
-                Environment.Exit(1);
+                // Sent telemetry to the IoT Hub
+                await DeviceToCloudCommunication.SendDeviceToCloudTelemetryAsync(deviceClient, scooterIsAvailable, scooterIsRecharging, currentBatteryLevel, cts.Token);
             }
         }
 
@@ -114,10 +68,25 @@ namespace SimulatedDeviceScooters
             var deviceId = Encoding.UTF8.GetString(methodRequest.Data);
 
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"Telemetry interval set to {telemetryInterval}");
+            Console.WriteLine($"Telemetry interval set to {TelemetryInterval}");
+
+            scooterIsAvailable = !scooterIsAvailable;
+
+            // Acknowlege the direct method call with a 200 success message
+            string result = $"{{\"result\":\"Executed direct method: {methodRequest.Name} for device {deviceId}\"}}";
+            return Task.FromResult(new MethodResponse(Encoding.UTF8.GetBytes(result), 200));
+        }
+
+        private static Task<MethodResponse> RechargeScooter(MethodRequest methodRequest, object userContext)
+        {
+            var deviceId = Encoding.UTF8.GetString(methodRequest.Data);
+            scooterIsRecharging = !scooterIsRecharging;
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"Telemetry interval set to {TelemetryInterval}");
             Console.ResetColor();
 
-            currentScooterAvailability = !currentScooterAvailability;
+            scooterIsAvailable = false;
 
             // Acknowlege the direct method call with a 200 success message
             string result = $"{{\"result\":\"Executed direct method: {methodRequest.Name} for device {deviceId}\"}}";
