@@ -12,7 +12,7 @@ It is a console application which simulated scooters by sending telemetry to IoT
 
 It is a NodeJs application which displays data in real time.
 
-3.	[AzureFunction](https://dev.azure.com/OnboardingMay2022/_git/OnboardingMay2022?path=/AzureFunction&version=GBadina/spike)
+3.	[DeviceManagement](https://dev.azure.com/OnboardingMay2022/_git/OnboardingMay2022?path=/DeviceManagement&version=GBadina/spike)
 
 
 # Build and Test
