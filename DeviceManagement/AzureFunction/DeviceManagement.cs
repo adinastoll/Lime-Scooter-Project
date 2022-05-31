@@ -2,7 +2,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
-namespace AzureFunction
+namespace DeviceManagement
 {
     using System;
     using System.IO;
