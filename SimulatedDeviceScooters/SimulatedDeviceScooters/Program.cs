@@ -18,7 +18,6 @@ namespace SimulatedDeviceScooters
         private static readonly TransportType TransportType = TransportType.Mqtt;
         private static readonly TimeSpan TelemetryInterval = TimeSpan.FromSeconds(1);
 
-        private static readonly double DefaultBatteryLevel = 100;
         private static readonly bool DefaultAvailability = true;
 
         private static readonly string RentScooterDirectMethod = "RentScooter";
@@ -26,7 +25,6 @@ namespace SimulatedDeviceScooters
 
         private static DeviceClient deviceClient;
 
-        private static double currentBatteryLevel = DefaultBatteryLevel;
         private static bool scooterIsAvailable = DefaultAvailability;
         private static bool scooterIsRecharging = false;
 
@@ -48,7 +46,7 @@ namespace SimulatedDeviceScooters
 
             // Set up a condition to quit the sample
             Console.WriteLine("Press control-C to exit.");
-            using (CancellationTokenSource cancellationTokenSource = new())
+            using (CancellationTokenSource cancellationTokenSource = new ())
             {
                 using CancellationTokenSource cts = cancellationTokenSource;
                 Console.CancelKeyPress += (sender, eventArgs) =>
@@ -58,8 +56,11 @@ namespace SimulatedDeviceScooters
                     Console.WriteLine("Exiting...");
                 };
 
-                // Sent telemetry to the IoT Hub
-                await DeviceToCloudCommunication.SendDeviceToCloudTelemetryAsync(deviceClient, scooterIsAvailable, scooterIsRecharging, currentBatteryLevel, cts.Token);
+                while (!cts.IsCancellationRequested)
+                {
+                    // Sent telemetry to the IoT Hub
+                    await DeviceToCloudCommunication.SendDeviceToCloudTelemetryAsync(deviceClient, scooterIsAvailable, scooterIsRecharging, cts.Token);
+                }
             }
         }
 
@@ -70,6 +71,7 @@ namespace SimulatedDeviceScooters
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Telemetry interval set to {TelemetryInterval}");
 
+            scooterIsRecharging = false;
             scooterIsAvailable = !scooterIsAvailable;
 
             // Acknowlege the direct method call with a 200 success message

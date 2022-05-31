@@ -19,6 +19,8 @@ namespace SimulatedDeviceScooters
         private static readonly TimeSpan TelemetryInterval = TimeSpan.FromSeconds(1);
         private static readonly string BatteryAlert = "batteryAlert";
         private static readonly double MinimumBatteryLevel = 20;
+        private static readonly double DefaultBatteryLevel = 100;
+        private static double currentBatteryLevel = DefaultBatteryLevel;
 
         /// <summary>
         /// Sends device to cloud telemetry.
@@ -26,54 +28,49 @@ namespace SimulatedDeviceScooters
         /// <param name="deviceClient">The Device Client.</param>
         /// <param name="scooterIsAvailable">The current availability of the device.</param>
         /// <param name="scooterIsRecharging">Whether the device is currently recharging or not.</param>
-        /// <param name="currentBatteryLevel">The current battery level of the device.</param>
         /// <param name="ct">The cancellation token.</param>
         /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-        public static async Task SendDeviceToCloudTelemetryAsync(DeviceClient deviceClient, bool scooterIsAvailable, bool scooterIsRecharging, double currentBatteryLevel, CancellationToken ct)
+        public static async Task SendDeviceToCloudTelemetryAsync(DeviceClient deviceClient, bool scooterIsAvailable, bool scooterIsRecharging, CancellationToken ct)
         {
-            while (!ct.IsCancellationRequested)
+            if (scooterIsRecharging)
             {
-                if (!scooterIsAvailable)
+                currentBatteryLevel += currentBatteryLevel * 0.1;
+            }
+            else if (!scooterIsAvailable)
+            {
+                currentBatteryLevel *= 0.9;
+            }
+
+            // Create JSON Message
+            string telemetryMessageBody = JsonSerializer.Serialize(
+                new
                 {
-                    currentBatteryLevel *= 0.9;
-                }
+                    battery = currentBatteryLevel,
+                    status = scooterIsAvailable,
+                });
 
-                if (scooterIsRecharging)
-                {
-                    currentBatteryLevel += currentBatteryLevel * 0.1;
-                }
+            using Message telemetryMessage = new (Encoding.ASCII.GetBytes(telemetryMessageBody))
+            {
+                ContentType = "application/json",
+                ContentEncoding = "utf-8",
+            };
 
-                // Create JSON Message
-                string telemetryMessageBody = JsonSerializer.Serialize(
-                    new
-                    {
-                        battery = currentBatteryLevel,
-                        status = scooterIsAvailable,
-                    });
+            // Add a custom application property to the message.
+            // An IoT hub can filter on these properties without access to the message body.
+            telemetryMessage.Properties.Add(BatteryAlert, (currentBatteryLevel < MinimumBatteryLevel) ? "true" : "false");
 
-                using Message telemetryMessage = new (Encoding.ASCII.GetBytes(telemetryMessageBody))
-                {
-                    ContentType = "application/json",
-                    ContentEncoding = "utf-8",
-                };
+            // Send the telemetry message
+            await deviceClient.SendEventAsync(telemetryMessage);
+            Console.WriteLine($"{DateTime.Now} > Sending message: {telemetryMessageBody}");
 
-                // Add a custom application property to the message.
-                // An IoT hub can filter on these properties without access to the message body.
-                telemetryMessage.Properties.Add(BatteryAlert, (currentBatteryLevel < MinimumBatteryLevel) ? "true" : "false");
-
-                // Send the telemetry message
-                await deviceClient.SendEventAsync(telemetryMessage);
-                Console.WriteLine($"{DateTime.Now} > Sending message: {telemetryMessageBody}");
-
-                try
-                {
-                    await Task.Delay(TelemetryInterval, ct);
-                }
-                catch (TaskCanceledException)
-                {
-                    // User canceled
-                    return;
-                }
+            try
+            {
+                await Task.Delay(TelemetryInterval, ct);
+            }
+            catch (TaskCanceledException)
+            {
+                // User canceled
+                return;
             }
         }
     }
