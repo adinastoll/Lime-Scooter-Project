@@ -16,11 +16,14 @@ namespace SimulatedDeviceScooters
     /// </summary>
     internal class DeviceToCloudCommunication
     {
-        private static readonly TimeSpan TelemetryInterval = TimeSpan.FromSeconds(1);
+        private static readonly TimeSpan TelemetryInterval = TimeSpan.FromSeconds(5);
         private static readonly string BatteryAlert = "batteryAlert";
         private static readonly double MinimumBatteryLevel = 20;
         private static readonly double DefaultBatteryLevel = 100;
         private static double currentBatteryLevel = DefaultBatteryLevel;
+
+        private static double latitude = 47.192480;
+        private static double longitude = 8.851230;
 
         /// <summary>
         /// Sends device to cloud telemetry.
@@ -39,14 +42,18 @@ namespace SimulatedDeviceScooters
             else if (!scooterIsAvailable)
             {
                 currentBatteryLevel *= 0.9;
+                latitude = latitude - 0.00002;
             }
 
+            // longitude = longitude - 0.02122M;
             // Create JSON Message
             string telemetryMessageBody = JsonSerializer.Serialize(
                 new
                 {
                     battery = currentBatteryLevel,
                     status = scooterIsAvailable,
+                    latitude = latitude,
+                    longitude = longitude,
                 });
 
             using Message telemetryMessage = new (Encoding.ASCII.GetBytes(telemetryMessageBody))

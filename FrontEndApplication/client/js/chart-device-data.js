@@ -5,51 +5,6 @@ $(document).ready(() => {
   const protocol = document.location.protocol.startsWith('https') ? 'wss://' : 'ws://';
   const webSocket = new WebSocket(protocol + location.host);
 
-  // The class for holding the last N points of telemetry from a device
-  class DeviceData {
-    constructor(deviceId) {
-      this.deviceId = deviceId;
-      this.maxLen = 50;
-      this.timeData = new Array(this.maxLen);
-      this.batteryData = new Array(this.maxLen);
-      this.deviceStatus = 'Unknown';
-    }
-
-    addData(time, battery, location, status) {
-      this.timeData.push(time);
-      this.batteryData.push(battery);
-
-      this.deviceStatus = status;
-
-      if (this.timeData.length > this.maxLen) {
-        this.timeData.shift();
-        this.batteryData.shift();
-      }
-    }
-  }
-
-  // All the devices in the list that have been sending telemetry
-  class TrackedDevices {
-    constructor() {
-      this.devices = []
-    }
-
-    // Find a device based on its Id
-    findDevice(deviceId) {
-      for (let i = 0; i < this.devices.length; ++i) {
-        if (this.devices[i].deviceId == deviceId) {
-          return this.devices[i];
-        }
-      }
-
-      return undefined;
-    }
-
-    getDevicesCount() {
-      return this.devices.length;
-    }
-  }
-
   const trackedDevices = new TrackedDevices();
 
   // Define the chart axes

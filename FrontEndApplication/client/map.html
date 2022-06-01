@@ -1,0 +1,39 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <!-- Ensures that IE and Edge uses the latest version and doesn't emulate an older version -->
+    <meta http-equiv="x-ua-compatible" content="IE=Edge">
+    <!-- Ensures the web page looks good on all screen sizes. -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Adding references to the Azure Maps Map control JavaScript and CSS files. Adding SignalR. -->
+    <link rel="stylesheet" href="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.css" type="text/css">
+    <script src="https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/3.1.7/signalr.min.js"></script>
+    <script src="./js/TrackedDevices.js"></script>
+    <script src="./js/DeviceData.js"></script>
+    <script src="./js/maps-device-location.js"></script>
+
+    <link rel="stylesheet" href="./css/mapstyle.css">
+</head>
+
+<body onload="InitMapAndSignalR()" class="MapBody">
+    <h1>Last known location</h1>
+    <div id="messages"></div>
+    <span>
+        <span id="deviceCount">0 devices</span>
+        <select id="listOfDevices" class="select_box"></select>
+    </span>
+    <span>
+        <span>Is Available:</span>
+        <span id="status"></span>
+    </span>
+
+    <button id="rentScooterButton" onclick="rentScooter()">Rent Scooter</button>
+    <button id="rechargeScooterButton" onclick="rechargeScooter()">Recharge Scooter</button>
+    
+    <div id="myMap"></div>
+</body>
+
+</html>
