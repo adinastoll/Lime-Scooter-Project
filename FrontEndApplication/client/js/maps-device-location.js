@@ -84,8 +84,10 @@ function InitMapAndSignalR() {
 
                 const existingDeviceData = trackedDevices.findDevice(messageData.DeviceId);
 
+                console.log(messageData.MessageDate, messageData.IotData.battery, messageData.IotData.location, messageData.IotData.status)
                 if (existingDeviceData) {
-                    existingDeviceData.addData(messageData.MessageDate, messageData.IotData.battery, messageData.IotData.location, messageData.IotData.status);
+                    existingDeviceData.updateData(messageData.MessageDate, messageData.IotData.battery, messageData.IotData.location, messageData.IotData.status);
+                    OnStatusChanged();
                 } else {
                     const newDeviceData = new DeviceData(messageData.DeviceId);
                     trackedDevices.devices.push(newDeviceData);
@@ -98,6 +100,8 @@ function InitMapAndSignalR() {
                     const nodeText = document.createTextNode(messageData.DeviceId);
                     node.appendChild(nodeText);
                     listOfDevices.appendChild(node);
+
+                    OnStatusChanged();
                 }
 
             }

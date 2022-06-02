@@ -16,7 +16,7 @@ namespace SimulatedDeviceScooters
     /// </summary>
     internal class DeviceToCloudCommunication
     {
-        private static readonly TimeSpan TelemetryInterval = TimeSpan.FromSeconds(5);
+        private static readonly TimeSpan TelemetryInterval = TimeSpan.FromSeconds(1);
         private static readonly string BatteryAlert = "batteryAlert";
         private static readonly double MinimumBatteryLevel = 20;
         private static readonly double DefaultBatteryLevel = 100;
@@ -42,7 +42,7 @@ namespace SimulatedDeviceScooters
             else if (!scooterIsAvailable)
             {
                 currentBatteryLevel *= 0.9;
-                latitude = latitude - 0.00002;
+                latitude = latitude - 0.0002;
             }
 
             // longitude = longitude - 0.02122M;

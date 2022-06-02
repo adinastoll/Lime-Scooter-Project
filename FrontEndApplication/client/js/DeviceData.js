@@ -19,4 +19,8 @@ class DeviceData {
             this.batteryData.shift();
         }
     }
+
+    updateData(time, battery, location, status){
+        this.deviceStatus = status;
+    }
 }
