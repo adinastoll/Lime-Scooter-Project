@@ -12,6 +12,22 @@ class DeviceData {
         this.timeData.push(time);
         this.batteryData.push(battery);
 
+        var deviceStatus = 'Undefined';
+        switch(status){
+            case 0:
+                deviceStatus = 'Available'
+                break;
+            case 1:
+                deviceStatus = 'Rented'
+                break;
+            case 2: 
+                deviceStatus = 'Recharging'
+                break;
+            case 3:
+                deviceStatus = 'Unavailable'
+                break;
+        }
+        
         this.deviceStatus = status;
 
         if (this.timeData.length > this.maxLen) {

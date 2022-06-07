@@ -67,16 +67,31 @@ $(document).ready(() => {
     const device = trackedDevices.findDevice(listOfDevices[listOfDevices.selectedIndex].text);
     deviceStatus.innerText = device.deviceStatus;
     console.log("Device status: ", device.deviceStatus);
-    if (device.deviceStatus === false) {
-      console.log("Is not available!!")
-      rentScooterButton.innerHTML = 'Return Scooter';
-      rentScooterButton.style.color = 'Red';
+    let innerHTML = 'Return Scooter';
+    let color = 'Red';
+
+    switch(device.deviceStatus){
+      case 'Available':
+        innerHTML = 'Rent Scooter';
+        color = 'Green';
+        break;
+      case 'Rented':
+        innerHTML = 'Return Scooter';
+        color = 'Red';
+        break;
+      case 'Recharging':
+        innerHTML = 'Recharging'
+        rentScooterButton.display = none;
+        break;
+      case 'Unavailable':
+        rentScooterButton.display = none;
+        break;
+      case 'Undefined':
+        rentScooterButton.display = none;
+        break;
     }
-    else {
-      console.log("It IS available--")
-      rentScooterButton.innerHTML = 'Rent Scooter';
-      rentScooterButton.style.color = 'Green';
-    }
+    rentScooterButton.innerHTML = innerHTML;
+    rentScooterButton.style.color = color;
   }
 
   listOfDevices.addEventListener('change', OnSelectionChange, false);
@@ -92,24 +107,28 @@ $(document).ready(() => {
     try {
       const messageData = JSON.parse(message.data);
       console.log(messageData);
+      console.log("messageData.IotData.latitude: ", messageData.IotData.Latitude);
 
+      console.log("messageData.IotData.location: ", messageData.IotData.Location);
+
+      // messageData = messageData.IotData;
       // time and either battery or location are required
-      if (!messageData.MessageDate || (!messageData.IotData.battery && !messageData.IotData.location)) {
-        return;
-      }
+      // if (!messageData.MessageDate || (!messageData.IotData.battery && !messageData.IotData.location)) {
+      //   return;
+      // }
 
       // find or add device to list of tracked devices
       const existingDeviceData = trackedDevices.findDevice(messageData.DeviceId);
 
       if (existingDeviceData) {
-        existingDeviceData.addData(messageData.MessageDate, messageData.IotData.battery, messageData.IotData.location, messageData.IotData.status);
+        existingDeviceData.addData(messageData.MessageDate, messageData.IotData.Battery, messageData.IotData.Location, messageData.IotData.Status);
       } else {
         const newDeviceData = new DeviceData(messageData.DeviceId);
         trackedDevices.devices.push(newDeviceData);
         const numDevices = trackedDevices.getDevicesCount();
         deviceCount.innerText = numDevices === 1 ? `${numDevices} device` : `${numDevices} devices`;
-        deviceStatus.innerText = messageData.IotData.status;
-        newDeviceData.addData(messageData.MessageDate, messageData.IotData.battery, messageData.IotData.location, messageData.IotData.status);
+        deviceStatus.innerText = messageData.IotData.Status;
+        newDeviceData.addData(messageData.MessageDate, messageData.IotData.Battery, messageData.IotData.Location, messageData.IotData.Status);
 
         // add device to the UI list
         const node = document.createElement('option');

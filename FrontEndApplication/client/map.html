@@ -31,9 +31,35 @@
     </span>
 
     <button id="rentScooterButton" onclick="rentScooter()">Rent Scooter</button>
+    <button id="returnScooterButton" onclick="returnScooter()">Return Scooter</button>
     <!-- <button id="rechargeScooterButton" onclick="rechargeScooter()">Recharge Scooter</button> -->
 
     <div id="myMap"></div>
 </body>
+<script>
+    function rentScooter() {
+        const xhr = new XMLHttpRequest()
+        //open a get request with the remote server URL
+        xhr.open("GET", "http://localhost:7071/api/RentDevice?deviceId=FirstScooter")
+        //send the Http request
+        xhr.send()
+    }
 
+    function returnScooter() {
+        const xhr = new XMLHttpRequest()
+        //open a get request with the remote server URL
+        xhr.open("GET", "http://localhost:7071/api/ReturnDevice?deviceId=FirstScooter")
+        //send the Http request
+        xhr.send()
+    }
+
+    function rechargeScooter() {
+        const xhr = new XMLHttpRequest()
+        //open a get request with the remote server URL
+        xhr.open("GET", "http://localhost:7071/api/RechargeDevice?deviceId=FirstScooter")
+        //send the Http request
+        xhr.send()
+    }
+
+</script>
 </html>

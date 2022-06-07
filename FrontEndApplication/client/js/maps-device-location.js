@@ -11,6 +11,8 @@ function InitMapAndSignalR() {
     const deviceCount = document.getElementById('deviceCount');
     const trackedDevices = new TrackedDevices();
     const deviceStatus = document.getElementById('status');
+    const rentScooterButton = document.getElementById('rentScooterButton');
+    const returnScooterButton = document.getElementById('returnScooterButton');
 
     listOfDevices.addEventListener('change', OnSelectionChange, false);
     deviceStatus.addEventListener('change', OnStatusChanged, false);
@@ -25,15 +27,48 @@ function InitMapAndSignalR() {
 
     function OnStatusChanged() {
         const device = trackedDevices.findDevice(listOfDevices[listOfDevices.selectedIndex].text);
-        deviceStatus.innerText = device.deviceStatus;
-        if (device.deviceStatus === false) {
-            rentScooterButton.innerHTML = 'Return Scooter';
-            rentScooterButton.style.color = 'Red';
+
+        let innerHTML = 'Return Scooter';
+        let color = 'Red';
+        let deviceStatusText = 'Undefined';
+
+        switch (device.deviceStatus) {
+            case 0:
+                innerHTML = 'Rent Scooter';
+                color = 'Green';
+                deviceStatusText = 'Available';
+                returnScooterButton.display = none;
+                rentScooterButton.display = true;
+                break;
+            case 1:
+                innerHTML = 'Return Scooter';
+                color = 'Red';
+                deviceStatusText = 'Rented';
+                rentScooter.display = none;
+                returnScooterButton.display = true;
+                break;
+            case 2:
+                innerHTML = 'Recharging'
+                rentScooterButton.display = none;
+                returnScooterButton.display = none;
+                deviceStatusText = 'Recharging';
+                break;
+            case 3:
+                rentScooterButton.display = none;
+                deviceStatusText = 'Unavailable';
+                rentScooterButton.display = none;
+                returnScooterButton.display = none;
+                break;
+            case 4:
+                rentScooterButton.display = none;
+                deviceStatusText = 'Undefined';
+                rentScooterButton.display = none;
+                returnScooterButton.display = none;
+                break;
         }
-        else {
-            rentScooterButton.innerHTML = 'Rent Scooter';
-            rentScooterButton.style.color = 'Green';
-        }
+        rentScooterButton.innerHTML = innerHTML;
+        rentScooterButton.style.color = color;
+        deviceStatus.innerText = deviceStatusText;
     }
 
     map = new atlas.Map('myMap', {
@@ -75,18 +110,18 @@ function InitMapAndSignalR() {
                 // }
                 const obj = messageData.IotData;
 
-                let text = "Latitude: " + obj.latitude + " Longitude: " + obj.longitude
+                let text = "Latitude: " + obj.Latitude + " Longitude: " + obj.Longitude
                 document.getElementById("messages").innerHTML = text;
 
                 // Replace the pin so only latest position is shown.
                 mapsDataSource.clear();
-                mapsDataSource.add(new atlas.data.Point([obj.longitude, obj.latitude]));
+                mapsDataSource.add(new atlas.data.Point([obj.Longitude, obj.Latitude]));
 
                 const existingDeviceData = trackedDevices.findDevice(messageData.DeviceId);
 
-                console.log(messageData.MessageDate, messageData.IotData.battery, messageData.IotData.location, messageData.IotData.status)
+                console.log(messageData.MessageDate, messageData.IotData.Battery, messageData.IotData.Location, messageData.IotData.status)
                 if (existingDeviceData) {
-                    existingDeviceData.updateData(messageData.MessageDate, messageData.IotData.battery, messageData.IotData.location, messageData.IotData.status);
+                    existingDeviceData.updateData(messageData.MessageDate, messageData.IotData.Battery, messageData.IotData.Location, messageData.IotData.Status);
                     OnStatusChanged();
                 } else {
                     const newDeviceData = new DeviceData(messageData.DeviceId);
