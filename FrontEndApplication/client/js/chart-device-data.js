@@ -55,6 +55,7 @@ $(document).ready(() => {
   const deviceStatus = document.getElementById('status');
   const listOfDevices = document.getElementById('listOfDevices');
   const rentScooterButton = document.getElementById('rentScooterButton');
+  const rechargeScooterButton = document.getElementById('rechargeScooterButton');
 
   function OnSelectionChange() {
     const device = trackedDevices.findDevice(listOfDevices[listOfDevices.selectedIndex].text);
@@ -67,31 +68,48 @@ $(document).ready(() => {
     const device = trackedDevices.findDevice(listOfDevices[listOfDevices.selectedIndex].text);
     deviceStatus.innerText = device.deviceStatus;
     console.log("Device status: ", device.deviceStatus);
+
     let innerHTML = 'Return Scooter';
     let color = 'Red';
+    let deviceStatusText = 'Undefined';
 
-    switch(device.deviceStatus){
-      case 'Available':
+    switch (device.deviceStatus) {
+      case 0:
         innerHTML = 'Rent Scooter';
         color = 'Green';
+        deviceStatusText = 'Available';
+        rechargeScooterButton.style.display = "block";
+        rentScooterButton.style.display = "block";
         break;
-      case 'Rented':
+      case 1:
         innerHTML = 'Return Scooter';
         color = 'Red';
+        deviceStatusText = 'Rented';
+        rechargeScooterButton.style.display = "none";
+        rentScooterButton.style.display = "none";
         break;
-      case 'Recharging':
+      case 2:
         innerHTML = 'Recharging'
-        rentScooterButton.display = none;
+        rechargeScooterButton.style.display = "block"
+        rentScooterButton.style.display = "none";
+        deviceStatusText = 'Recharging';
         break;
-      case 'Unavailable':
-        rentScooterButton.display = none;
+      case 3:
+        rentScooterButton.display = false;
+        deviceStatusText = 'Unavailable';
+        rentScooterButton.style.display = "none";
+        rechargeScooterButton.style.display = "none"
         break;
-      case 'Undefined':
-        rentScooterButton.display = none;
+      case 4:
+        rentScooterButton.display = false;
+        deviceStatusText = 'Undefined';
+        rentScooterButton.style.display = "none";
+        rechargeScooterButton.style.display = "none";
         break;
     }
     rentScooterButton.innerHTML = innerHTML;
     rentScooterButton.style.color = color;
+    deviceStatus.innerText = deviceStatusText;
   }
 
   listOfDevices.addEventListener('change', OnSelectionChange, false);

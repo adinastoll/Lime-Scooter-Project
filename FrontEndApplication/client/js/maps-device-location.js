@@ -37,33 +37,33 @@ function InitMapAndSignalR() {
                 innerHTML = 'Rent Scooter';
                 color = 'Green';
                 deviceStatusText = 'Available';
-                returnScooterButton.display = none;
-                rentScooterButton.display = true;
+                returnScooterButton.style.display = "none";
+                rentScooterButton.style.display = "block";
                 break;
             case 1:
                 innerHTML = 'Return Scooter';
                 color = 'Red';
                 deviceStatusText = 'Rented';
-                rentScooter.display = none;
-                returnScooterButton.display = true;
+                returnScooterButton.style.display  = "block";
+                rentScooterButton.style.display = "none";
                 break;
             case 2:
                 innerHTML = 'Recharging'
-                rentScooterButton.display = none;
-                returnScooterButton.display = none;
+                rentScooterButton.style.display = "none";
+                returnScooterButton.style.display = "none"
                 deviceStatusText = 'Recharging';
                 break;
             case 3:
-                rentScooterButton.display = none;
+                rentScooterButton.display = false;
                 deviceStatusText = 'Unavailable';
-                rentScooterButton.display = none;
-                returnScooterButton.display = none;
+                rentScooterButton.style.display = "none";
+                returnScooterButton.style.display = "none";
                 break;
             case 4:
-                rentScooterButton.display = none;
+                rentScooterButton.display = false;
                 deviceStatusText = 'Undefined';
-                rentScooterButton.display = none;
-                returnScooterButton.display = none;
+                rentScooterButton.style.display = "none";
+                returnScooterButton.style.display = "none";
                 break;
         }
         rentScooterButton.innerHTML = innerHTML;
