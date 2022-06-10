@@ -1,4 +1,4 @@
-﻿// <copyright file="IoTHubConnectionString.cs" company="Microsoft">
+﻿// <copyright file="ConnectionStringManager.cs" company="Microsoft">
 // Copyright (c) Microsoft. All rights reserved.
 // </copyright>
 
@@ -11,34 +11,42 @@ namespace DeviceManagement
     using Microsoft.Azure.Devices;
 
     /// <summary>
-    /// A singleton to hold the connection string to IoT Hub.
+    /// A singleton to hold the connection string to IoT Hub and device.
     /// </summary>
-    public class IoTHubConnectionString
+    public class ConnectionStringManager
     {
-        private static IoTHubConnectionString instance = null;
+        private static ConnectionStringManager instance = null;
 
-        private IoTHubConnectionString()
+        private ConnectionStringManager()
         {
-            this.ConnectionString = null;
+            this.IotHubConnectionString = null;
+            this.DeviceConnectionString = null;
         }
 
         /// <summary>
         /// Gets or sets the IoT Hub Connection String.
         /// </summary>
-        public string ConnectionString { get; set; }
+        public string IotHubConnectionString { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Connection String of the device.
+        /// </summary>
+        public string DeviceConnectionString { get; set; }
 
         /// <summary>
         /// Gets the IoTHubConnectionString instance.
         /// </summary>
         /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
-        public static async Task<IoTHubConnectionString> GetInstance()
+        public static async Task<ConnectionStringManager> GetInstance()
         {
             if (instance == null)
             {
-                instance = new IoTHubConnectionString();
+                instance = new ConnectionStringManager();
                 string iotHubConnectionString = await GetConnectionStringAsync("LimeScooterIoTHubConnectionString");
-                ValidateConnectionString(iotHubConnectionString);
-                instance.ConnectionString = iotHubConnectionString;
+                string deviceConnectionString = await GetConnectionStringAsync("FirstScooterConnectionString");
+
+                instance.IotHubConnectionString = iotHubConnectionString;
+                instance.DeviceConnectionString = deviceConnectionString;
             }
 
             return instance;
