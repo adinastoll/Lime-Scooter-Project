@@ -290,3 +290,6 @@ __pycache__/
 
 # Azure Functions
 local.settings.json
+
+# App config
+App.config

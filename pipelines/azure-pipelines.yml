@@ -1,0 +1,27 @@
+name: 1.0.$(Date:Mdd)$(rev:r) # This is the build number
+
+trigger:
+- adina-main
+
+pr:
+ branches:
+    include:
+    - adina*
+
+pool:
+  vmImage: 'windows-latest'
+
+steps:
+- task: DotNetCoreCLI@2
+  displayName: 'Build C# project'
+  inputs:
+    version: '6.0.x'
+    command: 'build'
+    projects: '**/*.csproj'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Run tests'
+  inputs:
+    version: '6.0.x'
+    command: 'test'
+    projects: '**/*Tests/*.csproj'

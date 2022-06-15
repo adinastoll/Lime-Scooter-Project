@@ -5,6 +5,7 @@
 namespace SimulatedDeviceScooters
 {
     using System;
+    using System.Configuration;
     using System.Threading.Tasks;
     using Azure.Identity;
     using Azure.Security.KeyVault.Secrets;
@@ -13,7 +14,7 @@ namespace SimulatedDeviceScooters
     /// <summary>
     /// Handler class for Connection Strings.
     /// </summary>
-    internal static class ConnectionStringHandler
+    public static class ConnectionStringHandler
     {
         /// <summary>
         /// Gets the connection string from Key Vault.
@@ -23,7 +24,7 @@ namespace SimulatedDeviceScooters
         public static async Task<string> GetConnectionStringAsync(string secretName)
         {
             // Get the IoT device connection string
-            string keyVaultUrl = "https://limescooterkeyvault.vault.azure.net/";
+            string keyVaultUrl = ConfigurationManager.AppSettings.Get("keyVaultUrl");
             var client = new SecretClient(vaultUri: new Uri(keyVaultUrl), credential: new DefaultAzureCredential());
             KeyVaultSecret keyVaultSecret = await client.GetSecretAsync(secretName);
             return keyVaultSecret?.Value;
@@ -33,7 +34,7 @@ namespace SimulatedDeviceScooters
         /// Validates that the given string is a valid Connection String.
         /// </summary>
         /// <param name="connectionString">The connection string to validate.</param>
-        public static void ValidateConnectionString(string connectionString)
+        public static void ValidateIotHubConnectionString(string connectionString)
         {
             try
             {
@@ -44,7 +45,7 @@ namespace SimulatedDeviceScooters
                 Console.WriteLine("An IoT Hub connection string needs to be specified, " +
                     "please set the environment variable \"IOTHUB_CONNECTION_STRING\" " +
                     "or pass in \"-s | --HubConnectionString\" through command line.");
-                Environment.Exit(1);
+                throw;
             }
         }
     }

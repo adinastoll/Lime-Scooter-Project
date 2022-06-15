@@ -7,55 +7,40 @@ namespace SimulatedDeviceScooters
     using System;
     using System.Text;
     using System.Text.Json;
-    using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Azure.Devices.Client;
+    using SimulatedDeviceScooters.DeviceProperties;
+    using SimulatedDeviceScooters.IoTHubDeviceClient;
 
     /// <summary>
-    /// This class is responsible with the device to cloud communication.
+    /// This class is responsible with sending telemetry to the IoT Hub.
     /// </summary>
-    internal class DeviceToCloudCommunication
+    public class DeviceToCloudCommunication
     {
-        private static readonly TimeSpan TelemetryInterval = TimeSpan.FromSeconds(1);
         private static readonly string BatteryAlert = "batteryAlert";
         private static readonly double MinimumBatteryLevel = 20;
-        private static readonly double DefaultBatteryLevel = 100;
-        private static double currentBatteryLevel = DefaultBatteryLevel;
-
-        private static double latitude = 47.192480;
-        private static double longitude = 8.851230;
 
         /// <summary>
         /// Sends device to cloud telemetry.
         /// </summary>
         /// <param name="deviceClient">The Device Client.</param>
-        /// <param name="scooterIsAvailable">The current availability of the device.</param>
-        /// <param name="scooterIsRecharging">Whether the device is currently recharging or not.</param>
-        /// <param name="ct">The cancellation token.</param>
+        /// <param name="devicePropertiesHandler">The handler for device properties.</param>
         /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
-        public static async Task SendDeviceToCloudTelemetryAsync(DeviceClient deviceClient, bool scooterIsAvailable, bool scooterIsRecharging, CancellationToken ct)
+        public static async Task SendDeviceToCloudTelemetryAsync(IDeviceClient deviceClient, IDevicePropertiesManager devicePropertiesHandler)
         {
-            if (scooterIsRecharging)
-            {
-                currentBatteryLevel += currentBatteryLevel * 0.1;
-            }
-            else if (!scooterIsAvailable)
-            {
-                currentBatteryLevel *= 0.9;
-                latitude = latitude - 0.0002;
-            }
+            var battery = await devicePropertiesHandler.GetBatteryLevelAsync();
 
-            // longitude = longitude - 0.02122M;
+            var deviceInformation = new TelemetryMessage
+            {
+                DeviceId = devicePropertiesHandler.GetDeviceId(),
+                Status = await devicePropertiesHandler.GetDeviceStatusAsync(),
+                Battery = battery,
+                Latitude = await devicePropertiesHandler.GetLatitudeAsync(),
+                Longitude = await devicePropertiesHandler.GetLongitudeAsync(),
+            };
+
             // Create JSON Message
-            string telemetryMessageBody = JsonSerializer.Serialize(
-                new
-                {
-                    battery = currentBatteryLevel,
-                    status = scooterIsAvailable,
-                    latitude = latitude,
-                    longitude = longitude,
-                });
-
+            string telemetryMessageBody = JsonSerializer.Serialize(deviceInformation);
             using Message telemetryMessage = new (Encoding.ASCII.GetBytes(telemetryMessageBody))
             {
                 ContentType = "application/json",
@@ -64,21 +49,11 @@ namespace SimulatedDeviceScooters
 
             // Add a custom application property to the message.
             // An IoT hub can filter on these properties without access to the message body.
-            telemetryMessage.Properties.Add(BatteryAlert, (currentBatteryLevel < MinimumBatteryLevel) ? "true" : "false");
+            telemetryMessage.Properties.Add(BatteryAlert, (battery < MinimumBatteryLevel) ? "true" : "false");
 
             // Send the telemetry message
             await deviceClient.SendEventAsync(telemetryMessage);
             Console.WriteLine($"{DateTime.Now} > Sending message: {telemetryMessageBody}");
-
-            try
-            {
-                await Task.Delay(TelemetryInterval, ct);
-            }
-            catch (TaskCanceledException)
-            {
-                // User canceled
-                return;
-            }
         }
     }
 }
