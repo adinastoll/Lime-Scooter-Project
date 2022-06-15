@@ -85,7 +85,6 @@ namespace SimulatedDeviceScooters.DeviceProperties
         /// <inheritdoc/>
         public void SetDirectMethodAsync()
         {
-            throw new System.NotImplementedException();
         }
 
         /// <summary>

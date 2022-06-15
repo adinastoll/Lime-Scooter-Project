@@ -52,7 +52,8 @@
             const xhr = new XMLHttpRequest()
             //open a get request with the remote server URL
             // xhr.open("GET", "http://localhost:7071/api/RechargeDevice?deviceId=FirstScooter")
-            xhr.open("GET", "http://localhost:7071/api/UpdateDeviceTwinStatusProperty?deviceId=FirstScooter&newStatus=Recharging")
+            //xhr.open("GET", "http://localhost:7071/api/UpdateDeviceTwinStatusProperty?deviceId=FirstScooter&newStatus=Recharging")
+            xhr.open("GET", "https://fa-limescooter-gmp4.azurewebsites.net/api/UpdateDeviceTwinStatusProperty?deviceId=FirstScooter&newStatus=Recharging")
             //send the Http request
             xhr.send()
         }
