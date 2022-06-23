@@ -1,3 +1,4 @@
+# This pipeline builds all the C# projects found in the project
 name: 1.0.$(Date:Mdd)$(rev:r) # This is the build number
 
 trigger:
@@ -15,13 +16,11 @@ steps:
 - task: DotNetCoreCLI@2
   displayName: 'Build C# project'
   inputs:
-    version: '6.0.x'
     command: 'build'
-    projects: '**/*.csproj'
+    projects: '**/*.csproj' # Builds all the csproj found in the project
 
 - task: DotNetCoreCLI@2
   displayName: 'Run tests'
   inputs:
-    version: '6.0.x'
     command: 'test'
-    projects: '**/*Tests/*.csproj'
+    projects: '**/*Tests/*.csproj' # Runs all the tests found in the project

@@ -1,0 +1,71 @@
+# Deploy resources to Azure based on the Bicep file
+parameters:
+  BicepFilePath: './infrastructure/infra.bicep'
+
+stages:
+- stage: LintValidate
+  displayName: Lint, validate & preview Bicep file
+  jobs: 
+  - job: LintValidateCode
+    displayName: Lint, validate, what-if Bicep file
+    steps:
+      - script: |
+          az bicep build --file ${{ parameters.BicepFilePath}}
+        name: LintBicepCode
+        displayName: Run Bicep linter
+      - task: AzureCLI@2
+        name: RunPrelightValidation
+        displayName: Run preflight validation
+        inputs:
+          azureSubscription: $(ServiceConnectionName)
+          scriptType: 'bash'
+          scriptLocation: 'inlineScript'
+          inlineScript: |
+            az deployment group validate \
+              --resource-group  $(ResourceGroupName) \
+              --template-file ${{ parameters.BicepFilePath }}
+      - task: AzureCLI@2
+        displayName: Run what-if
+        inputs:
+          azureSubscription: $(ServiceConnectionName)
+          scriptType: 'bash'
+          scriptLocation: 'inlineScript'
+          inlineScript: |
+            az deployment group what-if \
+              --resource-group $(ResourceGroupName) \
+              --template-file ${{ parameters.BicepFilePath }}
+
+- stage: ManualValidation
+  displayName: Manual validation
+  jobs:
+    - job: WaitForValidation
+      displayName: Wait for human validation
+      pool: server
+      timeoutInMinutes: 4320 # times out in 3 days
+      steps:
+      - task: ManualValidation@0
+        timeoutInMinutes: 1440 # tas times out in 1 day
+        inputs:
+          notifyUsers: |
+            adnegrau@microsoft.com
+          instructions: 'Please validate the output of what-if operation and resume'
+          onTimeout: 'resume'
+          
+
+- stage: DeployResources
+  displayName: Deploy Azure Resources
+  jobs: 
+    - job: DeployResources
+      displayName: Deploy Azure Resources
+      steps:
+        - task: AzureCLI@2
+          displayName: 'Deploy resources'
+          inputs:
+            azureSubscription: $(ServiceConnectionName)
+            scriptType: 'bash'
+            scriptLocation: 'inlineScript'
+            inlineScript: |
+              az deployment group create \
+                --name $(Build.BuildNumber) \
+                --resource-group $(ResourceGroupName) \
+                --template-file ${{ parameters.BicepFilePath }} \
