@@ -18,8 +18,8 @@ namespace DeviceManagement
 
     /// <summary>
     /// This class is responsible with cloud to device communication.
-    /// It contains Azure Functions to update the Device Twin properties - for the scenario in which the properties are stored as Device Twins, 
-    /// as well as Azure Functions which invoke Direct Methods on the device - for the scenario in which the properties of the device are stored in memory
+    /// It contains Azure Functions to update the Device Twin properties - for the scenario in which the properties are stored as Device Twins,
+    /// as well as Azure Functions which invoke Direct Methods on the device - for the scenario in which the properties of the device are stored in memory.
     /// </summary>
     public class DeviceManagement
     {
@@ -66,7 +66,7 @@ namespace DeviceManagement
             }
             else
             {
-                return new BadRequestObjectResult("Please pass a device id and a new status on the query string or in the request body");
+                return new BadRequestObjectResult("A device id and a new status are missing on the query string or in the request body.");
             }
         }
 
@@ -97,7 +97,7 @@ namespace DeviceManagement
             }
             else
             {
-                return new BadRequestObjectResult("Please pass a device id on the query string or in the request body");
+                return new BadRequestObjectResult("The device id is mandatory on the query string or in the request body.");
             }
         }
 
@@ -128,7 +128,7 @@ namespace DeviceManagement
             }
             else
             {
-                return new BadRequestObjectResult("Please pass a device id on the query string or in the request body");
+                return new BadRequestObjectResult("The device id is mandatory on the query string or in the request body.");
             }
         }
 
@@ -157,7 +157,7 @@ namespace DeviceManagement
             }
             else
             {
-                return new BadRequestObjectResult("Please pass a device id on the query string or in the request body");
+                return new BadRequestObjectResult("The device id is mandatory on the query string or in the request body.");
             }
         }
 

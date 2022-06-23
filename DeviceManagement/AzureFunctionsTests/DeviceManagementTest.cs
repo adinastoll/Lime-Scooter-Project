@@ -92,7 +92,7 @@ namespace AzureFunctionsTests
 
             // Assert - Check that the contents of the response are the expected contents
             var result = (BadRequestObjectResult)response.Result;
-            var expectedResult = $"Please pass a device id and a new status on the query string or in the request body";
+            var expectedResult = $"A device id and a new status are missing on the query string or in the request body.";
             Assert.Equal(expectedResult, result.Value);
         }
 
@@ -122,7 +122,7 @@ namespace AzureFunctionsTests
 
             // Assert - Check that the contents of the response are the expected contents
             var result = (BadRequestObjectResult)response.Result;
-            var expectedResult = $"Please pass a device id and a new status on the query string or in the request body";
+            var expectedResult = $"A device id and a new status are missing on the query string or in the request body.";
             Assert.Equal(expectedResult, result.Value);
         }
 
@@ -153,7 +153,7 @@ namespace AzureFunctionsTests
 
             // Assert - Check that the contents of the response are the expected contents
             var result = (BadRequestObjectResult)response.Result;
-            var expectedResult = $"Please pass a device id and a new status on the query string or in the request body";
+            var expectedResult = $"A device id and a new status are missing on the query string or in the request body.";
             Assert.Equal(expectedResult, result.Value);
         }
 

@@ -43,6 +43,7 @@ namespace DeviceManagement
             {
                 instance = new ConnectionStringManager();
                 string iotHubConnectionString = await GetConnectionStringAsync("LimeScooterIoTHubConnectionString");
+                ValidateIotHubConnectionString(iotHubConnectionString);
                 string deviceConnectionString = await GetConnectionStringAsync("FirstScooterConnectionString");
 
                 instance.IotHubConnectionString = iotHubConnectionString;
@@ -70,7 +71,7 @@ namespace DeviceManagement
         /// Validates that the given connection string is in the right format.
         /// </summary>
         /// <param name="hubConnectionString">The connection string to be validated.</param>
-        private static void ValidateConnectionString(string hubConnectionString)
+        private static void ValidateIotHubConnectionString(string hubConnectionString)
         {
             try
             {

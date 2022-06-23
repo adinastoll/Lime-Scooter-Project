@@ -13,14 +13,14 @@ namespace DeviceManagement
     using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 
     /// <summary>
-    /// fkjsdfjsf.
+    /// The Startup class.
     /// </summary>
     public class Startup : FunctionsStartup
     {
         /// <summary>
-        /// dsaljdlksajdsa.
+        /// The Configuration function.
         /// </summary>
-        /// <param name="builder">fkdsjflkdsjf.</param>
+        /// <param name="builder">The builder.</param>
         public override void Configure(IFunctionsHostBuilder builder)
         {
             builder.Services.AddSingleton<IDeviceTwinManagement>((s) =>
