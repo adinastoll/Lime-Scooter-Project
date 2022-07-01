@@ -56,3 +56,5 @@ The DeviceManagement application (Function App) will be deployed to App Service 
 3. Deploy the Azure Resources.
 4. Run the code and the tests, package the artficat in a ZIP file.
 5. Download the artifact and deploy.
+
+https://dev.azure.com/OnboardingMay2022/OnboardingMay2022/_git/OnboardingMay2022?version=GBadina/demo&path=/Demo.mp4
