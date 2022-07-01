@@ -71,6 +71,45 @@ namespace DeviceManagement
         }
 
         /// <summary>
+        /// Automaically update the Status of the scooter on the Device Twin when a battery allert comes in.
+        /// </summary>
+        /// <param name="myQueueItem">The request.</param>
+        /// <param name="deliveryCount">The ILogger.</param>
+        /// <param name="enqueuedTimeUtc">The enqueued time in UTC.</param>
+        /// <param name="messageId">The message Id.</param>
+        /// <param name="log">The log.</param>
+        [FunctionName("BatteryAlertServiceBusQueueTrigger")]
+        public void RunBatteryAlert(
+            [ServiceBusTrigger("battery-alerts", Connection = "ServiceBusConnection")]
+            string myQueueItem,
+            int deliveryCount,
+            DateTime enqueuedTimeUtc,
+            string messageId,
+            ILogger log)
+        {
+            log.LogInformation($"C# ServiceBus queue trigger function processed message: {myQueueItem}");
+            log.LogInformation($"EnqueuedTimeUtc={enqueuedTimeUtc}");
+            log.LogInformation($"DeliveryCount={deliveryCount}");
+            log.LogInformation($"MessageId={messageId}");
+
+            try
+            {
+                var telemetryMessage = JsonConvert.DeserializeObject<TelemetryMessage>(myQueueItem);
+                if (telemetryMessage == null || telemetryMessage.DeviceId == null)
+                {
+                    log.LogInformation("Could not identify the scooter. The update of its status was not performed.");
+                    return;
+                }
+
+                this.deviceTwinManagement.UpdateDeviceTwinStatusPropertyAsync(telemetryMessage.DeviceId, Status.Unavailable);
+            }
+            catch (Exception e)
+            {
+                log.LogError("Could not deserialize the message into a TelemetryMessage. Exception details: ", e);
+            }
+        }
+
+        /// <summary>
         /// Invokes the RentScooter direct method on the device.
         /// </summary>
         /// <param name="req">The request.</param>
