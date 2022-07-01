@@ -85,7 +85,6 @@ namespace SimulatedDeviceScooters.DeviceProperties
         /// <inheritdoc/>
         public void SetDirectMethodAsync()
         {
-            throw new System.NotImplementedException();
         }
 
         /// <summary>
@@ -124,11 +123,12 @@ namespace SimulatedDeviceScooters.DeviceProperties
         {
             TwinCollection reportedProperties = new TwinCollection();
             reportedProperties["battery"] = 100;
-            reportedProperties["latitude"] = 47.192480;
-            reportedProperties["longitude"] = 8.851230;
+
+            // reportedProperties["latitude"] = 47.192480;
+            // reportedProperties["longitude"] = 8.851230;
             reportedProperties["status"] = Status.Available;
 
-            this.deviceClient.UpdateReportedPropertiesAsync(reportedProperties).Wait();
+            // this.deviceClient.UpdateReportedPropertiesAsync(reportedProperties).Wait();
         }
     }
 }

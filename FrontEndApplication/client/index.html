@@ -1,0 +1,68 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <script src="https://code.jquery.com/jquery-3.4.0.min.js"
+        integrity="sha256-BJeo0qm959uMBGb65z40ejJYGSgR7REI4+CW1fNKwOg=" crossorigin="anonymous"" type=" text/javascript"
+        charset="utf-8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js" type="text/javascript"
+        charset="utf-8"></script>
+    
+    <link rel="stylesheet" href="./css/mapstyle.css">
+    <link href="css/style.css" rel="stylesheet" />
+    <script src="./js/TrackedDevices.js" type="text/javascript" charset="utf-8" ></script>
+    <script src="./js/DeviceData.js" type="text/javascript" charset="utf-8"></script>
+    <script src="js/chart-device-data.js" type="text/javascript" charset="utf-8"></script>
+    <title>Battery - Real-time Data</title>
+</head>
+
+<body>
+    <h1>Operator Dashboard </h1>
+    <div> 
+        <h3>Battery - Real-time Data</h3>
+        <span>
+            <span id="deviceCount">0 devices</span>
+            <select id="listOfDevices" class="select_box"></select>
+        </span>
+        <span>
+            <span>Status:</span>
+            <span id="status"></span>
+            <button id="rechargeScooterButton" onclick="rechargeScooter()">Recharge Scooter</button>
+        </span>
+        <div style="padding-top:10px"></div>
+        <button id="rentScooterButton" style="visibility:hidden" onclick="rentScooter()">Rent Scooter</button>
+      
+       
+    </div>
+    <div>
+        <canvas id="iotChart"></canvas>
+    </div>
+
+    <script>
+        // function rentScooter() {
+        //     const xhr = new XMLHttpRequest()
+        //     //open a get request with the remote server URL
+        //     xhr.open("GET", "http://localhost:7071/api/RentDevice?deviceId=FirstScooter")
+        //     //send the Http request
+        //     xhr.send()
+        // }
+
+        function rechargeScooter() {
+            const xhr = new XMLHttpRequest()
+            //open a get request with the remote server URL
+            xhr.open("GET", "http://localhost:7071/api/RechargeDevice?deviceId=FirstScooter")
+            //xhr.open("GET", "http://localhost:7071/api/UpdateDeviceTwinStatusProperty?deviceId=FirstScooter&newStatus=Recharging")
+            console.log("GET request to recharge scooter")
+            // xhr.open("GET", "https://fa-limescooter-gmp4.azurewebsites.net/api/UpdateDeviceTwinStatusProperty?deviceId=FirstScooter&newStatus=Recharging")
+            //send the Http request
+            xhr.send()
+        }
+
+    </script>
+</body>
+</html>

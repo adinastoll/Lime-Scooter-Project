@@ -17,8 +17,8 @@ namespace SimulatedDeviceScooters
     /// </summary>
     internal class Program
     {
-        private static readonly TransportType TransportType = TransportType.Mqtt;
-        private static readonly TimeSpan TelemetryInterval = TimeSpan.FromSeconds(1); // To be changed
+        private static readonly TransportType TransportType = TransportType.Amqp;
+        private static readonly TimeSpan TelemetryInterval = TimeSpan.FromSeconds(3); // To be changed
         private static readonly string DeviceId = "FirstScooter";
 
         private static async Task Main()
@@ -44,7 +44,10 @@ namespace SimulatedDeviceScooters
             // Set up a manager for reading / updating device properties.
             // For testing purposes we are using the InMemoryDevicePropertiesManager.
             var registryManager = Microsoft.Azure.Devices.RegistryManager.CreateFromConnectionString(iotHubConnectionString);
-            var devicePropertiesManager = new DeviceTwinsManager(deviceClient, DeviceId, registryManager);
+
+            var devicePropertiesManager = new InMemoryDevicePropertiesManager();
+
+            // var devicePropertiesManager = new DeviceTwinsManager(deviceClient, DeviceId, registryManager);
             devicePropertiesManager.SetDirectMethodAsync();
 
             using (CancellationTokenSource cancellationTokenSource = new ())
@@ -59,10 +62,11 @@ namespace SimulatedDeviceScooters
 
                 while (!cts.IsCancellationRequested)
                 {
+                    // devicePropertiesManager.SimulateBatteryAndLocationChanges();
+
                     // Sent telemetry to the IoT Hub
                     await DeviceToCloudCommunication.SendDeviceToCloudTelemetryAsync(customDeviceClient, devicePropertiesManager);
                     await Task.Delay(TelemetryInterval);
-                    devicePropertiesManager.SimulateBatteryAndLocationChanges();
                 }
             }
         }
