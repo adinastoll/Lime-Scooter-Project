@@ -12,6 +12,9 @@ namespace AzureFunctionsTests
     using Microsoft.Azure.Devices.Client;
     using System.Text;
     using Microsoft.Extensions.Logging;
+    using System.Text.Json;
+    using System.Threading;
+    using System;
 
     public class DeviceManagementTest
     {
@@ -69,7 +72,6 @@ namespace AzureFunctionsTests
         public void TestUpdateDeviceTwinStatusPropertyFailureNoDeviceIdQueryParameter()
         {
             var newStatusValue = "Available";
-            var logger = NullLoggerFactory.Instance.CreateLogger("Null Logger");
 
             // Arrange - missing "deviceId" parameter in the HttpRequest
             var request = new DefaultHttpRequest(new DefaultHttpContext())
@@ -130,7 +132,6 @@ namespace AzureFunctionsTests
         public void TestRentScooterFailureNoQueryParameter()
         {
             var queryStringValue = "abc";
-            var logger = NullLoggerFactory.Instance.CreateLogger("Null Logger");
 
             // Arrange - missing "newStatus" and "deviceId" parameters in the HttpRequest
             var request = new DefaultHttpRequest(new DefaultHttpContext())
@@ -155,6 +156,46 @@ namespace AzureFunctionsTests
             var result = (BadRequestObjectResult)response.Result;
             var expectedResult = $"A device id and a new status are missing on the query string or in the request body.";
             Assert.Equal(expectedResult, result.Value);
+        }
+
+        [Fact]
+        public void TestBatteryAlertCustomEndpoint()
+        {
+            // Arrange
+            bool testPassed = true;
+            var deviceInformation = new TelemetryMessage
+            {
+                DeviceId = "FirstScooter",
+                Status = Status.Available,
+                Battery = 20,
+                Latitude = 0,
+                Longitude = 0,
+            };
+
+            string telemetryMessageBody = JsonSerializer.Serialize(deviceInformation);
+
+            SemaphoreSlim semaphore = new SemaphoreSlim(0);
+            var deviceTwinManagement = new Mock<IDeviceTwinManagement>();
+
+            var methodResponse = new MethodResponse(Encoding.UTF8.GetBytes(""), 200);
+            deviceTwinManagement.Setup(x => x.UpdateDeviceTwinStatusPropertyAsync(It.IsAny<string>(), It.IsAny<Status>()))
+                .Callback((string deviceId, Status newStatus) => {
+                    semaphore.Release();
+                })
+                .ReturnsAsync(methodResponse);
+
+            var deviceManagement = new DeviceManagement(deviceTwinManagement.Object);
+
+            // Act
+            deviceManagement.RunBatteryAlert(telemetryMessageBody, 1,DateTime.Now, "Id", logger);
+
+            if (!semaphore.Wait(TimeSpan.FromSeconds(5)))
+            {
+                testPassed = false;
+            }
+
+            // Assert
+            Assert.True(testPassed);
         }
 
     }
