@@ -7,3 +7,8 @@ This project, inspired from [here](https://docs.microsoft.com/en-us/azure/iot-hu
 - Configure your IoT Hub with a device, a consumer group, and use that info for connecting a device and a service application
 - On a website, register for device telemetry and broadcast it over a web socket to attached clients
 - In a web page, display device data in a chart
+
+To run:
+1. Run '.\init.ps1'
+2. Run 'npm install'.
+3. Run 'npm run start'.

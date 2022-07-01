@@ -171,6 +171,8 @@ namespace DeviceManagement
         {
             // Create a ServiceClient to communicate with service-facing endpoint on your hub.
             var connectionStringInstance = await ConnectionStringManager.GetInstance();
+
+            // The main entry point for communicating with IoT Hub
             serviceClient = ServiceClient.CreateFromConnectionString(connectionStringInstance.IotHubConnectionString);
 
             var methodInvocation = new CloudToDeviceMethod(methodName)

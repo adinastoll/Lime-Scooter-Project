@@ -71,7 +71,7 @@ namespace AzureFunctionsTests
             var newStatusValue = "Available";
             var logger = NullLoggerFactory.Instance.CreateLogger("Null Logger");
 
-            // Arrange - missing "newStatus" parameter in the HttpRequest
+            // Arrange - missing "deviceId" parameter in the HttpRequest
             var request = new DefaultHttpRequest(new DefaultHttpContext())
             {
                 Query = new QueryCollection

@@ -52,7 +52,7 @@ namespace SimulatedDeviceScooters.DeviceProperties
                     this.battery *= 0.9;
                     break;
                 case Status.Recharging:
-                    this.battery += 0.1;
+                    this.battery += 0.5;
                     break;
             }
 

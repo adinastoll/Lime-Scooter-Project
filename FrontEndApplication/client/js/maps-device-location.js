@@ -69,6 +69,7 @@ function InitMapAndSignalR() {
         rentScooterButton.innerHTML = innerHTML;
         rentScooterButton.style.color = color;
         deviceStatus.innerText = deviceStatusText;
+        deviceStatus.style.color = color;
     }
 
     map = new atlas.Map('myMap', {
@@ -104,15 +105,8 @@ function InitMapAndSignalR() {
         webSocket.onmessage = function onMessage(message) {
             try {
                 const messageData = JSON.parse(message.data);
-                // time and either battery or location are required
-                // if (!messageData.MessageDate || (!messageData.IotData.battery && !messageData.IotData.location)) {
-                //     return;
-                // }
+
                 const obj = messageData.IotData;
-
-                let text = "Latitude: " + obj.Latitude + " Longitude: " + obj.Longitude
-                document.getElementById("messages").innerHTML = text;
-
                 // Replace the pin so only latest position is shown.
                 mapsDataSource.clear();
                 mapsDataSource.add(new atlas.data.Point([obj.Longitude, obj.Latitude]));

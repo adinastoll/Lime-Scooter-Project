@@ -16,20 +16,22 @@
     <script src="./js/maps-device-location.js"></script>
 
     <link rel="stylesheet" href="./css/mapstyle.css">
+    <link href="css/style.css" rel="stylesheet" />
 </head>
 
 <body onload="InitMapAndSignalR()" class="MapBody">
-    <h1>Last known location</h1>
+    <h1>User View </h1>
+    <h3>Last known scooter location</h3>
     <div id="messages"></div>
     <span>
         <span id="deviceCount">0 devices</span>
         <select id="listOfDevices" class="select_box"></select>
     </span>
     <span>
-        <span>Is Available:</span>
+        <span>Status:</span>
         <span id="status"></span>
     </span>
-
+    <div style="padding-top:10px"></div>
     <button id="rentScooterButton" onclick="rentScooter()">Rent Scooter</button>
     <button id="returnScooterButton" onclick="returnScooter()">Return Scooter</button>
     <!-- <button id="rechargeScooterButton" onclick="rechargeScooter()">Recharge Scooter</button> -->
@@ -40,9 +42,10 @@
     function rentScooter() {
         const xhr = new XMLHttpRequest()
         //open a get request with the remote server URL
-        // xhr.open("GET", "http://localhost:7071/api/RentDevice?deviceId=FirstScooter")
-        // xhr.open("GET", "http://localhost:7071/api/UpdateDeviceTwinStatusProperty?deviceId=FirstScooter&newStatus=Rented")
-        xhr.open("GET", "https://fa-limescooter-gmp4.azurewebsites.net/api/UpdateDeviceTwinStatusProperty?deviceId=FirstScooter&newStatus=Rented")
+        xhr.open("GET", "http://localhost:7071/api/RentDevice?deviceId=FirstScooter")
+        
+        //xhr.open("GET", "http://localhost:7071/api/UpdateDeviceTwinStatusProperty?deviceId=FirstScooter&newStatus=Rented")
+        // xhr.open("GET", "https://fa-limescooter-gmp4.azurewebsites.net/api/UpdateDeviceTwinStatusProperty?deviceId=FirstScooter&newStatus=Rented")
         xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
         //send the Http request
         xhr.send()
@@ -50,10 +53,11 @@
 
     function returnScooter() {
         const xhr = new XMLHttpRequest()
-        //open a get request with the remote server URL
-        // xhr.open("GET", "http://localhost:7071/api/ReturnDevice?deviceId=FirstScooter")
-        // xhr.open("GET", "http://localhost:7071/api/UpdateDeviceTwinStatusProperty?deviceId=FirstScooter&newStatus=Available")
-        xhr.open("GET", "https://fa-limescooter-gmp4.azurewebsites.net/api/UpdateDeviceTwinStatusProperty?deviceId=FirstScooter&newStatus=Available")
+        //open a get request with the remote server URL  
+        xhr.open("GET", "http://localhost:7071/api/ReturnDevice?deviceId=FirstScooter")
+        
+        //xhr.open("GET", "http://localhost:7071/api/UpdateDeviceTwinStatusProperty?deviceId=FirstScooter&newStatus=Available")
+        // xhr.open("GET", "https://fa-limescooter-gmp4.azurewebsites.net/api/UpdateDeviceTwinStatusProperty?deviceId=FirstScooter&newStatus=Available")
         xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
         //send the Http request
         xhr.send()
@@ -62,9 +66,9 @@
     function rechargeScooter() {
         const xhr = new XMLHttpRequest()
         //open a get request with the remote server URL
-        // xhr.open("GET", "http://localhost:7071/api/RechargeDevice?deviceId=FirstScooter")
-        // xhr.open("GET", "http://localhost:7071/api/UpdateDeviceTwinStatusProperty?deviceId=FirstScooter&newStatus=Recharging")
-        xhr.open("GET", "https://fa-limescooter-gmp4.azurewebsites.net/api/UpdateDeviceTwinStatusProperty?deviceId=FirstScooter&newStatus=Recharging")
+        xhr.open("GET", "http://localhost:7071/api/RechargeDevice?deviceId=FirstScooter")
+        //xhr.open("GET", "http://localhost:7071/api/UpdateDeviceTwinStatusProperty?deviceId=FirstScooter&newStatus=Recharging")
+        //xhr.open("GET", "https://fa-limescooter-gmp4.azurewebsites.net/api/UpdateDeviceTwinStatusProperty?deviceId=FirstScooter&newStatus=Recharging")
         xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
         //send the Http request
         xhr.send()

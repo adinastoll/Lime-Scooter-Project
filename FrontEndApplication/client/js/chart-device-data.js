@@ -110,6 +110,7 @@ $(document).ready(() => {
     rentScooterButton.innerHTML = innerHTML;
     rentScooterButton.style.color = color;
     deviceStatus.innerText = deviceStatusText;
+    deviceStatus.style.color = color;
   }
 
   listOfDevices.addEventListener('change', OnSelectionChange, false);
@@ -124,16 +125,10 @@ $(document).ready(() => {
   webSocket.onmessage = function onMessage(message) {
     try {
       const messageData = JSON.parse(message.data);
-      console.log(messageData);
-      console.log("messageData.IotData.latitude: ", messageData.IotData.Latitude);
+      console.log("Received Data: ", messageData);
+      // console.log("messageData.IotData.latitude: ", messageData.IotData.Latitude);
 
       console.log("messageData.IotData.location: ", messageData.IotData.Location);
-
-      // messageData = messageData.IotData;
-      // time and either battery or location are required
-      // if (!messageData.MessageDate || (!messageData.IotData.battery && !messageData.IotData.location)) {
-      //   return;
-      // }
 
       // find or add device to list of tracked devices
       const existingDeviceData = trackedDevices.findDevice(messageData.DeviceId);
