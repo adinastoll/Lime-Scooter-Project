@@ -49,8 +49,9 @@ Azure Function application with HTTP GET triggers which invokes direct method on
 # Build and Test
 See the README section from each project mentioned above.
 
+<!-- ([adina-azure-function-CI-CD-pipeline](https://dev.azure.com/OnboardingMay2022/OnboardingMay2022/_build?definitionId=4)). -->
 # Deploy
-The DeviceManagement application (Function App) will be deployed to App Service through a continous delivery pipeline ([adina-azure-function-CI-CD-pipeline](https://dev.azure.com/OnboardingMay2022/OnboardingMay2022/_build?definitionId=4)). The pipeline contains 5 stages and the YAML file can be found [here](https://dev.azure.com/OnboardingMay2022/_git/OnboardingMay2022?path=/pipelines/deploy/azure-function-build-deploy-pipeline.yml):.
+The DeviceManagement application (Function App) will be deployed to App Service through a continous delivery pipeline. The pipeline contains 5 stages and the YAML file can be found [here](https://dev.azure.com/OnboardingMay2022/_git/OnboardingMay2022?path=/pipelines/deploy/azure-function-build-deploy-pipeline.yml):
 1. Validate the Bicep file (/infrastructure/infra.bicep) which describes the Azure resources needed. (Storage Account, Function App, App Insights, Hosting Plan). It also displays the results of "what-if" operation which previews the changes.
 2. Manual Validation stage which waits for a confirmation of the previous "what-if" operation.
 3. Deploy the Azure Resources.
